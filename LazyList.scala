@@ -73,3 +73,36 @@ object LazyList:
 
   def apply[A](as: A*): LazyList[A] =
     if as.isEmpty then empty else cons(as.head, apply(as.tail*))
+
+  // E5.8
+  def continually[A](a: A): LazyList[A] =
+    lazy val single = cons(a, continually(a))
+    single
+
+  // E5.9
+  def from(n: Int): LazyList[Int] = cons(n, from(n + 1))
+
+  // E5.10
+  def fibs: LazyList[Int] = {
+    def fibn(n: Int): Int =
+      if (n == 0) then 0 else if (n == 1) then 1 else fibn(n - 1) + fibn(n - 2)
+    from(0).map(fibn)
+  }
+
+  // E5.11
+  def unfold[A, S](state: S)(f: S => Option[(A, S)]): LazyList[A] =
+    f(state) match
+      case None       => empty
+      case Some(a, s) => cons(a, unfold(s)(f))
+
+  // E5.12
+  def continuallyUnfold[A](a: A): LazyList[A] =
+    unfold(())(_ => Some((a, ())))
+
+  def onesUnfold: LazyList[Int] = unfold(())(_ => Some((1, ())))
+
+  def fromUnfold(n: Int): LazyList[Int] =
+    unfold(n)(n => Some((n, n + 1)))
+
+  def fibsUnfold: LazyList[Int] = unfold((0, 1)): (current, next) =>
+    Some((current, (next, current + next)))
