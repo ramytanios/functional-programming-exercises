@@ -54,6 +54,14 @@ enum LazyList[+A]:
   def filter(f: A => Boolean): LazyList[A] =
     this.foldRight(empty[A])((a, acc) => if (f(a)) then cons(a, acc) else acc)
 
+  // E5.7
+  def append[A2 >: A](that: => LazyList[A2]): LazyList[A2] =
+    this.foldRight(that)((a, acc) => cons(a, acc))
+
+  // E5.7
+  def flatMap[B](f: A => LazyList[B]): LazyList[B] =
+    this.foldRight(empty[B])((a, acc) => f(a).append(acc))
+
 object LazyList:
 
   def cons[A](hd: => A, tl: => LazyList[A]): LazyList[A] =
